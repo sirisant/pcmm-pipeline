@@ -3,7 +3,9 @@ import numpy as np
 from nilearn.image import resample_to_img
 import glob
 import os
+import json
 
+# Get all subjects
 def get_subjects(data_dir):
     """Find all subject folders"""
     subjects = sorted([
@@ -13,9 +15,20 @@ def get_subjects(data_dir):
     ])
     return subjects
 
-def run_parcellation(data_dir, output_dir, atlas_file, subjects):
+# Extract Repetition Time (TR) 
+def get_TR(bold_file):
+    """Extract TR from BOLD .json sidecar file"""
+    json_file = bold_file.replace('.nii.gz', '.json')
+    if not os.path.exists(json_file):
+        raise FileNotFoundError(f"No json sidecar found: {json_file}")
+    with open(json_file, 'r') as f:
+        TR = json.load(f)['RepetitionTime']
+    print(f"Repetition Time: {TR}s")
+    return TR
+
+def run_parcellation(data_dir, output_dir, atlas_file, subjects, atlas_name):
     """Run atlas parcellation on bold files. Assumes bold files in MNI space."""
-    os.makedirs(output_dir, exist_ok=False) # Create relevant output directory
+    os.makedirs(output_dir, exist_ok=True) # Create relevant output directory
 
     # Resample atlas only once using the first BOLD file from the first subject
     ref_file = sorted(glob.glob(os.path.join(data_dir, subjects[0], 'func', '*_space-MNI152NLin2009cAsym_*_desc-preproc_bold.nii.gz')))[0]
@@ -33,7 +46,7 @@ def run_parcellation(data_dir, output_dir, atlas_file, subjects):
         
         files = sorted(glob.glob(os.path.join(func_dir, f'{sub}_*_space-MNI152NLin2009cAsym_*_desc-preproc_bold.nii.gz'))) # Finds all desc-preproc bold .nii files in MNI space (sorted)
         out_dir = os.path.join(output_dir, sub, 'func')
-        os.makedirs(out_dir, exist_ok=False) # Creates output folders for each subject
+        os.makedirs(out_dir, exist_ok=True) # Creates output folders for each subject
 
         for bold_file in files:
             bold_data = nib.load(bold_file).get_fdata()
@@ -50,6 +63,7 @@ def run_parcellation(data_dir, output_dir, atlas_file, subjects):
             run  = [part for part in os.path.basename(bold_file).split('_') if 'run' in part][0]
 
             # Save .txt file for each ROI timeseries for each task type and run number
-            out_file = os.path.join(out_dir, f'{sub}_{task}_{run}_schaefer100tian32_timeseries.txt')
-            np.savetxt(out_file, ROI_timeseries)
+            TR = get_TR(bold_file) # Get TR from .json file
+            out_file = os.path.join(out_dir, f'{sub}_{task}_{run}_{atlas_name}_timeseries.txt')
+            np.savetxt(out_file, ROI_timeseries, header=f'TR={TR}') # Save TR as header
             print(f"Saved: {out_file} {ROI_timeseries.shape}")

@@ -2,28 +2,22 @@ import numpy as np
 import os
 import glob
 
-def run_phase2complex(data_dir, output_dir, subjects):
-    os.makedirs(output_dir, exist_ok=False)
+def prepare_input(data_dir, output_dir, atlas_name):
+    """Load hilbert phase timeseries and convert to complex eigenvectors.
+    Returns concatenated complex matrix as input to the PCMM."""
+    os.makedirs(output_dir, exist_ok=True)
 
-    for sub in subjects:
-        func_dir = os.path.join(data_dir, sub, 'func')
+    phase_files = sorted(glob.glob(os.path.join(data_dir, 'sub-*', 'func', f'*{atlas_name}_hilbert.txt')))
+    all_z = []
+    for f in phase_files:
+        phase = np.loadtxt(f)
+        p = phase.shape[1]
+        u_j = 1/np.sqrt(p) * np.exp(1j * phase) # e^(iθⱼ) on the unit circle
+        all_z.append(u_j)
 
-        files = sorted(glob.glob(os.path.join(func_dir, f'{sub}_*_schaefer100tian32_hilbert.txt')))
+    Z = np.concatenate(all_z, axis=0)
+    print(f"Input matrix shape: {Z.shape}")  # (n_total_timepoints, n_regions)
 
-        out_dir = os.path.join(output_dir, sub, 'func')
-        os.makedirs(out_dir, exist_ok=False)
-
-        for phase_file in files:
-            phase = np.loadtxt(phase_file) # Shape: (timepoints, 132)
-
-            p = phase.shape[1] # Number of regions = 132
-
-            # Convert to complex eigenvector
-            z = 1/np.sqrt(p) * np.exp(1j * phase)  # (timepoints, 132)
-
-            task = [part for part in os.path.basename(phase_file).split('_') if 'task' in part][0]
-            run  = [part for part in os.path.basename(phase_file).split('_') if 'run' in part][0]
-
-            out_file = os.path.join(out_dir, f'{sub}_{task}_{run}_schaefer100tian32_phase2complex.npy')
-            np.save(out_file, z)
-            print(f"Saved: {out_file} {z.shape}")
+    out_file = os.path.join(output_dir, f'Z_{atlas_name}.npy')
+    np.save(out_file, Z)
+    print(f"Saved: {out_file}")
