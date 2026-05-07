@@ -54,7 +54,7 @@ def run_parcellation(data_dir, output_dir, atlas_file, subjects, atlas_name):
             nx, ny, nz, nt = bold_data.shape
             bold_2d = bold_data.reshape(nx*ny*nz, nt) # Flatten voxels in bold file (voxels, timepoints)
 
-            ROI_timeseries = np.zeros((nt, nROIs)) # Create zero-matrix
+            ROI_timeseries = np.zeros((nt, nROIs), dtype=np.float32) # Create zero-matrix
             for r in range(1, nROIs + 1):
                     ROI_timeseries[:, r-1] = bold_2d[atlas_1d == r, :].mean(axis=0) # Average BOLD-timeseries for ROI r
             

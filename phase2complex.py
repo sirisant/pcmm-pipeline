@@ -11,6 +11,7 @@ def prepare_input(data_dir, output_dir, atlas_name):
     all_z = []
     for f in phase_files:
         phase = np.loadtxt(f)
+        print(phase.shape)
         p = phase.shape[1]
         u_j = 1/np.sqrt(p) * np.exp(1j * phase) # e^(iθⱼ) on the unit circle
         all_z.append(u_j)

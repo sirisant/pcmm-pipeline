@@ -8,10 +8,10 @@ def run_modeling(data_dir, output_dir, K, num_repl, max_iter, tol, init, atlas_n
     Z_path = os.path.join(data_dir, f'Z_{atlas_name}.npy')
     Z = np.load(Z_path)
 
-    C, Z_part, obj = diametrical_clustering(X=Z,K=K,max_iter=max_iter,num_repl=num_repl,tol=tol,init=init)
+    C, X_part, obj = diametrical_clustering(X=Z,K=K,max_iter=max_iter,num_repl=num_repl,tol=tol,init=init)
 
     np.savetxt(os.path.join(output_dir, "C.txt"), C)
-    np.savetxt(os.path.join(output_dir, "Z_part.txt"), Z_part)
+    np.savetxt(os.path.join(output_dir, "X_part.txt"), X_part)
     np.savetxt(os.path.join(output_dir, "obj.txt"), obj)
 
     print(f"Saved complex diametrical clustering outputs to {output_dir}")

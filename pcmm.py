@@ -8,7 +8,8 @@ from diametrical_clustering import run_modeling
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='PCMM pipeline')
-    parser.add_argument('dataset_dir', type=str,   help='Path to dataset eg. C:\\data\\ds006623')
+    parser.add_argument('dataset_dir', type=str,   help='Path to dataset eg. C:\\data\\ds006623\\derivaties\\fmriprep_output')
+    parser.add_argument('output_dir', type=str,   help='Path to dataset eg. C:\\data\\ds006623\\derivaties')
     parser.add_argument('atlas', type=str, help='Full path to atlas file eg. C:\\atlas\\Schaefer100.nii')
     parser.add_argument('--atlas_name', type=str, default='atlas', help='Short name for atlas for file names eg. schaefer100tian32')
     parser.add_argument('--lowcut',    type=float, default=0.03, help='default: 0.03 Hz')
@@ -29,8 +30,9 @@ if __name__ == "__main__":
     atlas_file  = args.atlas
 
     # Path to chosen dataset
-    data_dir   = os.path.join(args.dataset_dir, 'derivatives', 'fmriprep_output')
-    output_dir = os.path.join(args.dataset_dir, 'derivatives')
+    data_dir   = args.dataset_dir
+    # Path to chosen output folder
+    output_dir = args.output_dir
 
     # Ændre så man ikke behøver at lave analyse på alle subjekter på en gang?
     subjects = get_subjects(data_dir)
@@ -51,3 +53,11 @@ if __name__ == "__main__":
 
     if 'all' in args.steps or 'diametrical_clustering' in args.steps:
         run_modeling(os.path.join(output_dir, 'phase2complex'), os.path.join(output_dir, 'diametrical_clustering'), args.K, args.num_repl, args.max_iter, args.tol, args.init, args.atlas_name)
+
+## Visualization and analysis
+
+    #if 'partition_X_part' in args.steps:
+            #partition(os.path.join(output_dir, 'diametrical_clustering'), os.path.join(output_dir, 'partition_X_part'))
+
+    #if 'plot_X_part' in args.steps:
+        #plot_X_part_subs()
