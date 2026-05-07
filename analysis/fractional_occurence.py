@@ -1,7 +1,7 @@
 import numpy as np
 
 # Extract X_part
-X_part = np.loadtxt(r"C:\Users\Siri_\NRU\fMRI_internship\Analyse\diametrical_clustering_output\X_part.txt")
+X_part = np.loadtxt(r"C:\Users\Siri_\NRU\fMRI_internship\projekt\diametrical_clustering_output\X_part.txt")
 
 # Number of subjects in the study
 n_subjects = 25 # sub-29 removed

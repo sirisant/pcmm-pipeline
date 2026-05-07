@@ -4,7 +4,7 @@ import os
 # def partition_X_part(data_dir, output_dir)
 
 # Extract X_part
-X_part = np.loadtxt(r"C:\Users\Siri_\NRU\fMRI_internship\Analyse\diametrical_clustering_output\X_part.txt")
+X_part = np.loadtxt(r"C:\Users\Siri_\NRU\fMRI_internship\projekt\diametrical_clustering_output\X_part.txt")
 print(X_part.shape)
 
 # Number of subjects in the study

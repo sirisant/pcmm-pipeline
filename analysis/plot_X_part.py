@@ -2,7 +2,7 @@
 import numpy as np
 
 # Extract X_part
-X_part = np.loadtxt(r"C:\Users\Siri_\NRU\fMRI_internship\Analyse\diametrical_clustering_output\X_part.txt")
+X_part = np.loadtxt(r"C:\Users\Siri_\NRU\fMRI_internship\projekt\diametrical_clustering_output\X_part.txt")
 print(X_part.shape)
 
 # Number of subjects in the study
@@ -27,7 +27,7 @@ print(f"First scan: {scans[0].shape}")    # (1145,)
 import os
 import matplotlib.pyplot as plt
 
-output_dir = r'C:\Users\Siri_\NRU\fMRI_internship\Analyse\plots_X_part'
+output_dir = r'C:\Users\Siri_\NRU\fMRI_internship\projekt\analysis\plots_X_part'
 os.makedirs(output_dir, exist_ok=True)
 
 TR = 0.8 # I have it saved in a header
