@@ -1,24 +1,44 @@
 import numpy as np
 import os
 import glob
+import numpy as np
+import os
+import glob
+import pandas as pd
 
 def prepare_input(data_dir, output_dir, atlas_name):
     """Load hilbert phase timeseries and convert to complex eigenvectors.
     Returns concatenated complex matrix as input to the PCMM."""
     os.makedirs(output_dir, exist_ok=True)
 
-    phase_files = sorted(glob.glob(os.path.join(data_dir, 'sub-*', 'func', f'*{atlas_name}_hilbert.txt')))
+    phase_files = sorted(glob.glob(os.path.join(data_dir, 'sub-*', 'func', f'*_{atlas_name}_hilbert.txt')))
+    
     all_z = []
+    metadata = [] 
+
     for f in phase_files:
         phase = np.loadtxt(f)
         print(phase.shape)
-        p = phase.shape[1]
+        n_timepoints, p = phase.shape
+
         u_j = 1/np.sqrt(p) * np.exp(1j * phase) # e^(iθⱼ) on the unit circle
         all_z.append(u_j)
 
+        metadata.append({
+            'filename':    os.path.basename(f),
+            'n_timepoints': n_timepoints
+        })
+
     Z = np.concatenate(all_z, axis=0)
-    print(f"Input matrix shape: {Z.shape}")  # (n_total_timepoints, n_regions)
+    print(f"Input matrix shape: {Z.shape}") # (n_total_timepoints, n_regions)
 
     out_file = os.path.join(output_dir, f'Z_{atlas_name}.npy')
     np.save(out_file, Z)
     print(f"Saved: {out_file}")
+
+    df = pd.DataFrame(metadata)
+    df.to_csv(os.path.join(output_dir, f'Z_{atlas_name}_metadata.csv'), index=False)
+    print(f"Saved metadata: {df.shape}")
+    print(df.head())
+
+    return Z, df
